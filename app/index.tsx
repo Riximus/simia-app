@@ -12,7 +12,7 @@ export default function Index() {
         const checkAuth = async () => {
             const { data } = await supabase.auth.getSession();
             if (data.session) {
-                router.replace('/(protected)/(tabs)/home'); // If logged in, go to HomeScreen
+                router.replace('/(protected)/(tabs)/meds'); // If logged in, go to HomeScreen
             } else {
                 router.replace('/(auth)/login'); // If not logged in, go to LoginScreen
             }
