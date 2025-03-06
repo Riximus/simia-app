@@ -6,12 +6,13 @@ import {Text} from "@/components/ui/text";
 import {Button, ButtonIcon, ButtonText} from "@/components/ui/button";
 import {ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, Icon} from '@/components/ui/icon';
 import {Card} from "@/components/ui/card";
+import MedsCard from '@/components/meds-card';
 import { Pill, EllipsisVertical } from "lucide-react-native"
+import MedsList from "@/components/meds-list";
 
 export default function Tab() {
     return (
-        <>
-        <View>
+        <View className={"mt-3 mx-3"}>
             <VStack>
                 {/* Medication View Options */}
                 <HStack className="flex justify-between">
@@ -62,31 +63,13 @@ export default function Tab() {
 
                 {/* Medication Card */}
                 {/* TODO: Do a Grid instead */}
-                <Card size="lg">
-                    <HStack className="flex items-center justify-between">
-                        <HStack>
-                            <Icon as={Pill}/>
-                            <Heading>Elvanse</Heading>
-                        </HStack>
-                        <Button variant="link">
-                            <ButtonIcon as={EllipsisVertical} />
-                        </Button>
-                    </HStack>
-                    <HStack className="flex">
-                        <VStack className="grow">
-                            <Text bold={true}>Next dose</Text>
-                            <Text>9:00</Text>
-                            <Text size="sm" style={styles.textColor}>1h 22m until next dose</Text>
-                        </VStack>
-                        <VStack className="grow">
-                            <Text>10:00 AM</Text>
-                            <Text>Take 1 capsule</Text>
-                        </VStack>
-                    </HStack>
-                </Card>
+
+                <MedsCard />
+
+                <MedsList />
+
             </VStack>
         </View>
-        </>
     );
 };
 
