@@ -1,17 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
+import StockCard from "@/components/stock-card";
 
 export default function Tab() {
     return (
-        <View style={styles.container}>
-            <Text>Tab Stock</Text>
+        <View className={"mt-2 mx-2"}>
+            <StockCard />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});

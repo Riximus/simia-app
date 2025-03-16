@@ -1,5 +1,7 @@
 import { Tabs } from 'expo-router';
 import {FontAwesome5, FontAwesome6} from "@expo/vector-icons";
+import {Icon} from "@/components/ui/icon";
+import {Boxes, ListTodo} from "lucide-react-native";
 
 export default function TabLayout() {
     return (
@@ -8,28 +10,32 @@ export default function TabLayout() {
                 name="meds/index"
                 options={{
                     title: 'Medications',
-                    tabBarIcon: ({ color }) => <FontAwesome5 size={28} name="pills" color={color} />,
+                    headerTitleAlign: 'center',
+                    tabBarIcon: ({ color }) => <FontAwesome5 size={18} name="pills" color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="stock/index"
                 options={{
                     title: 'Stock',
-                    tabBarIcon: ({ color }) => <FontAwesome6 size={28} name="boxes-stacked" color={color} />,
+                    headerTitleAlign: 'center',
+                    tabBarIcon: ({ color }) => <Icon size={'xl'} as={Boxes} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="todos/index"
                 options={{
                     title: 'Todos',
-                    tabBarIcon: ({ color }) => <FontAwesome6 size={28} name="pen-to-square" color={color} />,
+                    headerTitleAlign: 'center',
+                    tabBarIcon: ({ color }) => <Icon size={'xl'} as={ListTodo} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="settings/index"
                 options={{
+                    headerTitleAlign: 'center',
                     title: 'Settings',
-                    tabBarIcon: ({ color }) => <FontAwesome5 size={28} name="cog" color={color} />,
+                    tabBarIcon: ({ color }) => <FontAwesome5 size={18} name="cog" color={color} />,
                 }}
             />
         </Tabs>

@@ -21,7 +21,7 @@ export default function LoginScreen() {
         if (error) {
             Alert.alert('Error', error.message);
         } else if (data.session) {
-            router.replace('/home'); // Redirect to home after login
+            router.replace('/(protected)/(tabs)/meds'); // Redirect to home after login
         }
     };
     return (

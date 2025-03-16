@@ -14,29 +14,35 @@ import {
     Info,
     TriangleAlert,
     Package,
-    SkipForward, CircleCheckBig, CircleCheck, Hourglass
+    SkipForward, CircleCheckBig, CircleCheck, Hourglass, Undo, Check, EllipsisVertical, BoxIcon
 } from "lucide-react-native";
 import {baseStyles} from "@/styles/base";
 import {FontAwesome} from "@expo/vector-icons";
 import {VStack} from "@/components/ui/vstack";
-import {Box} from "@/components/ui/box";
 import {Progress, ProgressFilledTrack} from "@/components/custom/progress";
-import {Button, ButtonText} from "@/components/ui/button";
+import {Button, ButtonIcon, ButtonText} from "@/components/ui/button";
+import {Divider} from "@/components/ui/divider";
 
 export default function MedsCard() {
     return (
         <Card size={"lg"} className={'flex gap-4'}>
             {/* Header */}
             <VStack>
-                <HStack space={'sm'} className={'items-center'}>
-                    <Icon size={'md'} as={Pill} style={baseStyles.iconOpacity} />
-                    <Heading size={'2xl'}>{'Elvanse'}</Heading>
-                    <Badge action={'warning'} variant={'solid'} size={'md'}>
-                        <BadgeIcon>
-                            <Icon as={TriangleAlert} size={'xs'} style={baseStyles.iconOpacity}/>
-                        </BadgeIcon>
-                        <BadgeText>{'1h 32m'}</BadgeText>
-                    </Badge>
+                <HStack className={'flex items-center justify-between'}>
+                    {/*<Icon size={'md'} as={Pill} style={baseStyles.iconOpacity} />*/}
+                    <HStack space={'sm'} className={'items-center'}>
+                        <FontAwesome name={"circle"} color={"#3471fa"}/>
+                        <Heading size={'2xl'}>{'Elvanse'}</Heading>
+                        <Badge action={'warning'} variant={'solid'} size={'md'}>
+                            <BadgeIcon>
+                                <Icon as={TriangleAlert} size={'xs'} style={baseStyles.iconOpacity}/>
+                            </BadgeIcon>
+                            <BadgeText>{'Next dose: 32m'}</BadgeText>
+                        </Badge>
+                    </HStack>
+                    <Button variant="link">
+                        <ButtonIcon as={EllipsisVertical}/>
+                    </Button>
                 </HStack>
                 <HStack space={'xs'} className={'items-center'} style={baseStyles.textOpacity}>
                     <Text>{'Pill'}</Text>
@@ -50,19 +56,24 @@ export default function MedsCard() {
             </VStack>
 
             {/* Content */}
-            <VStack>
+            <HStack className={'justify-between'}>
                 <HStack space={'xs'} className={'items-center'}>
                     <Icon as={AlarmClock} size={'sm'} style={baseStyles.iconOpacity}/>
                     {/* TODO: Or 'Mar 5 at 11:00 AM' when everything was taken */}
-                    <Text size={'xl'} bold={true}>{'11:00 AM'}</Text>
+                    <Text>{'11:00 AM'}</Text>
                 </HStack>
                 <HStack space={'xs'} className={'items-center'}>
                     <Icon as={Utensils} size={'sm'} style={baseStyles.iconOpacity}/>
-                    <Text size={'xl'}>During meal</Text>
+                    <Text>During meal</Text>
                 </HStack>
-            </VStack>
+                <HStack space={'xs'} className={'items-center'}>
+                    <Icon as={BoxIcon} size={'sm'} style={baseStyles.iconOpacity}/>
+                    <Text>32 remaining</Text>
+                </HStack>
+            </HStack>
 
             {/* Stock */}
+            {/*}
             <VStack>
                 <HStack className={'flex justify-between'}>
                     <HStack space={'xs'} className={'items-center'}>
@@ -72,10 +83,13 @@ export default function MedsCard() {
 
                     <Text>{'Runs out: Jun 18'}</Text>
                 </HStack>
+
                 <Progress value={45}>
                     <ProgressFilledTrack style={{ backgroundColor: '#a1a1a1'}} />
                 </Progress>
+
             </VStack>
+            */}
 
             {/* Notes */}
             <VStack>
@@ -83,22 +97,31 @@ export default function MedsCard() {
                 <Text>{'This will be the description and it should stretch a specified column width for example in this code 2 columns'}</Text>
             </VStack>
 
+            <Divider />
+
             {/* Doses */}
-            <VStack space={'md'}>
-                <HStack className={'flex flex-row justify-between'} style={[styles.overdueBg ,styles.padding]}>
+            <VStack space={'sm'}>
+                <HStack className={'flex flex-row justify-between'} style={[styles.padding]}>
                     <HStack space={'xs'} className={'items-center'}>
-                        <Icon as={TriangleAlert} size={'sm'} style={baseStyles.iconOpacity}/>
+                        <Icon as={Clock} size={'sm'} style={baseStyles.iconOpacity}/>
                         <Text>{'8:00 AM'}</Text>
-                        <Text size={"2xs"}>{'• 20m overdue'}</Text>
+                        <Badge size={"sm"} action={"error"}>
+                            <BadgeIcon>
+                                <Icon as={TriangleAlert} />
+                            </BadgeIcon>
+                            <BadgeText>Overdue</BadgeText>
+                        </Badge>
                     </HStack>
                     <HStack space={'md'}>
-                        <Button variant={'outline'}>
-                            <ButtonText>
+                        <Button variant={'outline'} size={'sm'}>
+                            <ButtonIcon as={SkipForward}/>
+                            <ButtonText size={'md'}>
                                 Skip
                             </ButtonText>
                         </Button>
-                        <Button>
-                            <ButtonText>
+                        <Button size={'sm'}>
+                            <ButtonIcon as={Check}/>
+                            <ButtonText size={'md'}>
                                 Take
                             </ButtonText>
                         </Button>
@@ -106,40 +129,61 @@ export default function MedsCard() {
                 </HStack>
                 <HStack className={'flex justify-between'} style={styles.padding}>
                     <HStack space={'xs'} className={'items-center'}>
-                        <Icon as={SkipForward} size={'sm'} style={baseStyles.iconOpacity}/>
+                        <Icon as={Clock} size={'sm'} style={baseStyles.iconOpacity}/>
                         <Text>{'12:00 PM'}</Text>
-                    </HStack>
-                    <HStack space={'md'}>
-                        <Badge size={"lg"}>
-                            <BadgeText>Skipped</BadgeText>
+                        <Badge size={"sm"}>
+                            <BadgeIcon>
+                                <Icon as={SkipForward} />
+                            </BadgeIcon>
+                            <BadgeText>Skipped 4:02 PM</BadgeText>
                         </Badge>
                     </HStack>
-                </HStack>
-                <HStack className={'flex justify-between'} style={styles.padding}>
-                    <HStack space={'xs'} className={'items-center'}>
-                        <Icon as={CircleCheckBig} size={'sm'} style={baseStyles.iconOpacity}/>
-                        <Text>{'4:00 PM'}</Text>
-                    </HStack>
-                    <HStack space={'md'}>
-                        <Badge action={"success"} size={"lg"}>
-                            <BadgeText>Taken</BadgeText>
-                        </Badge>
-                    </HStack>
+                    <Button variant={'link'}>
+                        <ButtonIcon as={Undo}/>
+                        <ButtonText>
+                            Undo
+                        </ButtonText>
+                    </Button>
                 </HStack>
                 <HStack className={'flex justify-between'} style={styles.padding}>
                     <HStack space={'xs'} className={'items-center'}>
                         <Icon as={Clock} size={'sm'} style={baseStyles.iconOpacity}/>
+                        <Text>{'4:00 PM'}</Text>
+                        <Badge action={"success"} size={"sm"}>
+                            <BadgeIcon>
+                                <Icon as={Check} />
+                            </BadgeIcon>
+                            <BadgeText>Taken 4:02 PM</BadgeText>
+                        </Badge>
+                    </HStack>
+                    <Button variant={'link'}>
+                        <ButtonIcon as={Undo}/>
+                        <ButtonText>
+                            Undo
+                        </ButtonText>
+                    </Button>
+                </HStack>
+                <HStack className={'flex justify-between'} style={styles.padding}>
+                    <HStack space={'xs'} className={'items-center'}>
+                        <Icon as={AlarmClock} size={'sm'} style={baseStyles.iconOpacity}/>
                         <Text>{'8:00 PM'}</Text>
-                        <Text size={"2xs"}>{'• in 20m'}</Text>
+                        <Badge action={"info"} size={"sm"}>
+                            <BadgeIcon>
+                                <Icon as={Info} />
+                            </BadgeIcon>
+                            <BadgeText>in 32m</BadgeText>
+                        </Badge>
                     </HStack>
                     <HStack space={'md'}>
-                        <Button variant={'outline'}>
-                            <ButtonText>
+                        <Button variant={'outline'} size={'sm'}>
+                            <ButtonIcon as={SkipForward}/>
+                            <ButtonText size={'md'}>
                                 Skip
                             </ButtonText>
                         </Button>
-                        <Button>
-                            <ButtonText>
+                        <Button size={'sm'}>
+                            <ButtonIcon as={Check}/>
+                            <ButtonText size={'md'}>
                                 Take
                             </ButtonText>
                         </Button>
@@ -167,5 +211,8 @@ const styles = StyleSheet.create({
     },
     padding: {
         padding: 4
+    },
+    colorLabel: {
+        color: '#3471fa'
     }
 })
