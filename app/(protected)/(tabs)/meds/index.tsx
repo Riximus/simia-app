@@ -25,44 +25,17 @@ export default function Tab() {
             <VStack space={"xs"}>
                 {/* Calendar View */}
                 <HStack className="flex justify-between">
-                    <Button>
+                    <Button size={'xl'} className={'rounded-xl'} variant={'outline'}>
                         <ButtonIcon as={ChevronLeftIcon}/>
                     </Button>
-                    <Button>
+                    <Button size={'xl'} className={'rounded-xl'}>
                         <ButtonIcon as={CalendarDaysIcon}/>
-                        <ButtonText>Calendar Day March 3</ButtonText>
+                        <ButtonText>March 3 2025</ButtonText>
                     </Button>
-                    <Button>
+                    <Button size={'xl'} className={'rounded-xl'} variant={'outline'}>
                         <ButtonIcon as={ChevronRightIcon}/>
                     </Button>
                 </HStack>
-                {/* Medication View Options */}
-                <HStack className="justify-center items-center">
-                    {/*}
-                    <ButtonGroup space={'xl'} flexDirection={'row'}>
-                        <Button variant={isCardView ? 'outline' : 'solid'} onPress={()=>toggleView(false)}>
-                            <ButtonIcon as={List}/>
-                        </Button>
-                        <Button variant={isCardView ? 'solid' : 'outline'} onPress={()=>toggleView(true)}>
-                            <ButtonIcon as={Grid2x2}/>
-                        </Button>
-                    </ButtonGroup>
-                    */}
-                </HStack>
-
-                {/* Medication List */}
-                {/* "No Medication" Card */}
-                {/*
-                <Card size="lg">
-                    <Text className="text-center">
-                        No medications scheduled for this day
-                    </Text>
-                </Card>
-
-                                {
-                    isCardView ? <MedsCard /> : <MedsList />
-                }
-                */}
 
                 {/* Medication Card */}
                 <ScrollView style={styles.scrollView}>
@@ -87,6 +60,7 @@ const styles = StyleSheet.create({
         color: 'red'
     },
     scrollView: {
-        marginBottom: 90
+        marginBottom: 105,
+        borderRadius: 8
     }
 });

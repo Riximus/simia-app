@@ -19,7 +19,7 @@ export default function HomeScreen() {
     return (
         <VStack>
             <Text>Welcome, User Email!</Text>
-            <Button onPress={handleLogout}>
+            <Button>
                 <ButtonText>Logout</ButtonText>
             </Button>
         </VStack>

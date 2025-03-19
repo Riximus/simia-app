@@ -9,7 +9,7 @@ export const Colors = {
   light: {
     text: '#11181C',
     background: '#fff',
-    accent: '#000', // TODO: Add accent color
+    accent: '#f2f', // TODO: Add accent color
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: '#0a7ea4',

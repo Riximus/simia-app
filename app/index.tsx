@@ -11,7 +11,9 @@ export default function Index() {
     useEffect(() => {
         const checkAuth = async () => {
             const { data } = await supabase.auth.getSession();
-            if (data.session) {
+            const skip = true;
+            if (data.session || skip) {
+            // TODO: if (data.session) {
                 router.replace('/(protected)/(tabs)/meds'); // If logged in, go to HomeScreen
             } else {
                 router.replace('/(auth)/login'); // If not logged in, go to LoginScreen

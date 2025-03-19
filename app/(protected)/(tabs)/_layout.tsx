@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import {FontAwesome5, FontAwesome6} from "@expo/vector-icons";
 import {Icon} from "@/components/ui/icon";
-import {Boxes, ListTodo} from "lucide-react-native";
+import {Boxes, ListTodo, PlusCircleIcon} from "lucide-react-native";
 
 export default function TabLayout() {
     return (
@@ -23,11 +23,11 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="todos/index"
+                name="add-medication/index"
                 options={{
-                    title: 'Todos',
+                    title: 'Add Medication',
                     headerTitleAlign: 'center',
-                    tabBarIcon: ({ color }) => <Icon size={'xl'} as={ListTodo} color={color} />,
+                    tabBarIcon: ({ color }) => <Icon size={'xl'} as={PlusCircleIcon} color={color} />,
                 }}
             />
             <Tabs.Screen

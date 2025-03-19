@@ -31,7 +31,6 @@ export default function MedsCard() {
                 <HStack className={'flex items-center justify-between'}>
                     {/*<Icon size={'md'} as={Pill} style={baseStyles.iconOpacity} />*/}
                     <HStack space={'sm'} className={'items-center'}>
-                        <FontAwesome name={"circle"} color={"#3471fa"}/>
                         <Heading size={'2xl'}>{'Elvanse'}</Heading>
                         <Badge action={'warning'} variant={'solid'} size={'md'}>
                             <BadgeIcon>
