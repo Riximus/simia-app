@@ -30,7 +30,7 @@ import { useState, useEffect } from "react";
 import { Divider } from "@/components/ui/divider";
 import { CheckboxGroup } from "@/components/custom/checkbox";
 import { Radio, RadioGroup, RadioIndicator, RadioLabel } from "@/components/custom/radio";
-import { NumberInput } from "@/components/NumberInput";
+import { NumberInput } from "@/components/number-input";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
@@ -221,7 +221,7 @@ export default function StockCard(props: StockCardProps) {
     }
 
     return (
-        <Card size={'lg'} className={'gap-4'} style={runningLow ? styles.cardWarning : styles.card}>
+        <Card size={'lg'} className={'gap-4 border'} style={runningLow ? styles.cardWarning : styles.card}>
             <HStack space={'sm'} className={'items-center justify-between'}>
                 <HStack space={'sm'} className={'items-center'}>
                     <Heading
@@ -381,12 +381,12 @@ export default function StockCard(props: StockCardProps) {
 
 const styles = StyleSheet.create({
     card: {
-        borderLeftColor: '#4caf50',
-        borderLeftWidth: 3,
-        gap: 20
+        borderLeftWidth: 4,
+        gap: 20,
+        borderColor: '#4caf50'
     },
     cardWarning: {
-        borderLeftColor: '#f44336',
-        borderLeftWidth: 3
+        borderColor: '#f44336',
+        borderLeftWidth: 4
     }
 });

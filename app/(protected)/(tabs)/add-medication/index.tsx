@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/select";
 import {
     AlarmClockPlusIcon, CalendarIcon,
-    ChevronDownIcon,
+    ChevronDownIcon, CircleCheckIcon,
     CircleIcon,
     ClockIcon,
     MinusIcon,
-    PlusIcon
+    PlusIcon, ShieldAlertIcon, TriangleAlertIcon
 } from "lucide-react-native";
 import {HStack} from "@/components/ui/hstack";
 import {Button, ButtonIcon, ButtonText} from "@/components/ui/button";
@@ -40,7 +40,9 @@ import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import {Box} from "@/components/ui/box";
 import uuid from 'react-native-uuid';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {NumberInput} from "@/components/NumberInput";
+import {NumberInput} from "@/components/number-input";
+import { useToast, Toast, ToastTitle, ToastDescription } from "@/components/ui/toast";
+
 
 interface MedicationTime {
     id: number;
@@ -49,6 +51,7 @@ interface MedicationTime {
 }
 
 export default function Index() {
+    const toast = useToast();
     // States for numeric values already exist:
     const [countTimesPerDay, setCountTimesPerDay] = useState(1);
     const [countDoseAmount, setCountDoseAmount] = useState(1);
@@ -209,40 +212,115 @@ export default function Index() {
             });
         }
         setErrors(newErrors);
-        if (valid) {
-            // Build medication data object
-            const medicationData = {
-                medicationName,
-                dosage,
-                description,
-                medicationType,
-                currentQuantity,
-                packageQuantity,
-                doseAmount: countDoseAmount,
-                timesPerDay: countTimesPerDay,
-                doseTimes: timeRadio === 'hasTime' ? medicationTimes.map(t => t.time) : [],
-                mealRelation,
-                interval,
-                intervalDays: interval === 'custom' ? intervalDays : [],
-                startDate: selectedDateString,
-            };
-            // Generate a unique id using UUID
-            const id = uuid.v4();
-            const newMedication = { id, ...medicationData };
 
-            try {
-                // Retrieve current medications
-                const storedMedications = await AsyncStorage.getItem('medications');
-                const medications = storedMedications ? JSON.parse(storedMedications) : [];
-                medications.push(newMedication);
-                await AsyncStorage.setItem('medications', JSON.stringify(medications));
-                const savedMedications = await AsyncStorage.getItem('medications');
-                console.log("Medication saved:", savedMedications);
-            } catch (error) {
-                console.error("Error saving medication:", error);
-            }
+        // If validation fails, show a warning toast.
+        if (!valid) {
+            toast.show({
+                placement: 'top',
+                duration: 3000,
+                render: ({ id }) => {
+                    const uniqueToastId = "toast-" + id;
+                    return (
+                        <Toast action="warning" variant="outline" nativeID={uniqueToastId} className="bg-orange-200 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between">
+                            <Icon as={TriangleAlertIcon} />
+                            <VStack>
+                                <ToastTitle>Missing Information</ToastTitle>
+                                <ToastDescription>Please fill all required fields.</ToastDescription>
+                            </VStack>
+                        </Toast>
+                    );
+                },
+            });
+            return;
+        }
+
+        // Build medication data object
+        const medicationData = {
+            medicationName,
+            dosage,
+            description,
+            medicationType,
+            currentQuantity,
+            packageQuantity,
+            doseAmount: countDoseAmount,
+            timesPerDay: countTimesPerDay,
+            doseTimes: timeRadio === 'hasTime' ? medicationTimes.map(t => t.time) : [],
+            mealRelation,
+            interval,
+            intervalDays: interval === 'custom' ? intervalDays : [],
+            startDate: selectedDateString,
+        };
+        const id = uuid.v4();
+        const newMedication = { id, ...medicationData };
+
+        try {
+            const storedMedications = await AsyncStorage.getItem('medications');
+            const medications = storedMedications ? JSON.parse(storedMedications) : [];
+            medications.push(newMedication);
+            await AsyncStorage.setItem('medications', JSON.stringify(medications));
+            console.log("Medication saved:", medications);
+
+            // Show success toast
+            toast.show({
+                placement: 'top',
+                duration: 3000,
+                render: ({ id }) => {
+                    const uniqueToastId = "toast-" + id;
+                    return (
+                        <Toast action="success" variant="solid" nativeID={uniqueToastId} className="bg-lime-700 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between">
+                            <Icon as={CircleCheckIcon} color={'#fff'}/>
+                            <VStack>
+                                <ToastTitle>Saving Successful!</ToastTitle>
+                                <ToastDescription>Your medication has been saved.</ToastDescription>
+                            </VStack>
+                        </Toast>
+                    );
+                },
+            });
+            // Clear all form data
+            clearForm();
+        } catch (error) {
+            // Show error toast if saving fails
+            toast.show({
+                placement: 'top',
+                duration: 3000,
+                render: ({ id }) => {
+                    const uniqueToastId = "toast-" + id;
+                    return (
+                        <Toast action="error" variant="outline" nativeID={uniqueToastId} className="bg-red-400 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between">
+                            <Icon as={ShieldAlertIcon} />
+                            <VStack>
+                                <ToastTitle>Error Saving!</ToastTitle>
+                                <ToastDescription>There was an error while saving your medication.</ToastDescription>
+                            </VStack>
+                        </Toast>
+                    );
+                },
+            });
+            console.error("Error saving medication:", error);
         }
     }
+
+    function clearForm() {
+        setMedicationName('');
+        setDosage('');
+        setDescription('');
+        setMedicationType('');
+        setCurrentQuantity('');
+        setPackageQuantity('');
+        setMealRelation('');
+        setInterval('');
+        setSelectedDateString(null);
+        setMarkedDate({});
+        setMedicationTimes([]);
+        setCountTimesPerDay(1);
+        setCountDoseAmount(1);
+        setIntervalDays([]);
+        setErrors({});
+    }
+
+
+
 
     function handleTimePickerDelete(index: number) {
         // Remove the time at the specified index

@@ -21,7 +21,9 @@ import {
 import {
     ChevronDownIcon,
     CalendarIcon,
-    Pencil, ArrowLeftIcon, SaveIcon,
+    Pencil,
+    ArrowLeftIcon,
+    SaveIcon,
 } from "lucide-react-native";
 import { HStack } from "@/components/ui/hstack";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
@@ -31,11 +33,15 @@ import { Checkbox, CheckboxGroup } from "@/components/custom/checkbox";
 import { Calendar } from "react-native-calendars";
 import { Icon } from "@/components/ui/icon";
 import { baseStyles } from "@/styles/base";
-import { NumberInput } from "@/components/NumberInput";
+import { NumberInput } from "@/components/number-input";
 import { TimePickerField } from "@/components/time-picker-field";
 import { PickedTime } from "@/types/time-picker-field";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
+
+// <-- Add these toast imports and icon imports -->
+import { useToast, Toast, ToastTitle, ToastDescription } from "@/components/ui/toast";
+import { TriangleAlertIcon, CircleCheckIcon, ShieldAlertIcon } from "lucide-react-native";
 
 interface MedicationTime {
     id: number;
@@ -46,6 +52,9 @@ interface MedicationTime {
 export default function EditMedication() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
+
+    // Initialize the toast hook
+    const toast = useToast();
 
     // States for numeric values:
     const [countTimesPerDay, setCountTimesPerDay] = useState(1);
@@ -95,7 +104,6 @@ export default function EditMedication() {
                         setCountTimesPerDay(med.timesPerDay);
                         if (med.doseTimes && med.doseTimes.length > 0) {
                             setTimeRadio("hasTime");
-                            // Create the medicationTimes array from the saved doseTimes
                             const times = med.doseTimes.map((time: string, index: number) => ({
                                 id: index,
                                 time,
@@ -169,9 +177,7 @@ export default function EditMedication() {
 
     function handleTimePicker(pickedTime: PickedTime, index: number) {
         const { hours, minutes } = pickedTime;
-        const updatedTime = `${hours.toString().padStart(2, "0")}:${minutes
-            .toString()
-            .padStart(2, "0")}`;
+        const updatedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
         const updatedTimes = [...medicationTimes];
         updatedTimes[index] = { ...updatedTimes[index], time: updatedTime, showPicker: false };
         setMedicationTimes(updatedTimes);
@@ -202,6 +208,7 @@ export default function EditMedication() {
 
     // Save changes: validate and update the medication in AsyncStorage
     async function handleSave() {
+        console.log("Saving medication...");
         const newErrors: { [key: string]: boolean } = {};
         let valid = true;
         if (!medicationName.trim()) {
@@ -245,38 +252,108 @@ export default function EditMedication() {
             });
         }
         setErrors(newErrors);
-        if (valid) {
-            const updatedMedication = {
-                id,
-                medicationName,
-                dosage,
-                description,
-                medicationType,
-                currentQuantity,
-                packageQuantity,
-                doseAmount: countDoseAmount,
-                timesPerDay: countTimesPerDay,
-                doseTimes: timeRadio === "hasTime" ? medicationTimes.map((t) => t.time) : [],
-                mealRelation,
-                interval,
-                intervalDays: interval === "custom" ? intervalDays : [],
-                startDate: selectedDateString,
-                // Optionally preserve or update the labelColor as needed:
-                labelColor: "#4caf50",
-            };
 
-            try {
-                const storedMedications = await AsyncStorage.getItem("medications");
-                if (storedMedications) {
-                    let medications = JSON.parse(storedMedications);
-                    medications = medications.map((med: any) => (med.id === id ? updatedMedication : med));
-                    await AsyncStorage.setItem("medications", JSON.stringify(medications));
-                    console.log("Medication updated:", updatedMedication);
-                    router.back(); // Navigate back after saving
-                }
-            } catch (error) {
-                console.error("Error updating medication:", error);
+        // Show warning toast if validation fails
+        if (!valid) {
+            toast.show({
+                placement: "top",
+                duration: 3000,
+                render: ({ id }) => {
+                    const uniqueToastId = "toast-" + id;
+                    return (
+                        <Toast
+                            action="warning"
+                            variant="outline"
+                            nativeID={uniqueToastId}
+                            className="bg-orange-200 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
+                        >
+                            <Icon as={TriangleAlertIcon} />
+                            <VStack>
+                                <ToastTitle>Missing Information</ToastTitle>
+                                <ToastDescription>Please fill all required fields.</ToastDescription>
+                            </VStack>
+                        </Toast>
+                    );
+                },
+            });
+            return;
+        }
+
+        const updatedMedication = {
+            id,
+            medicationName,
+            dosage,
+            description,
+            medicationType,
+            currentQuantity,
+            packageQuantity,
+            doseAmount: countDoseAmount,
+            timesPerDay: countTimesPerDay,
+            doseTimes: timeRadio === "hasTime" ? medicationTimes.map((t) => t.time) : [],
+            mealRelation,
+            interval,
+            intervalDays: interval === "custom" ? intervalDays : [],
+            startDate: selectedDateString,
+            labelColor: "#4caf50", // Optionally update as needed
+        };
+
+        try {
+            const storedMedications = await AsyncStorage.getItem("medications");
+            if (storedMedications) {
+                let medications = JSON.parse(storedMedications);
+                medications = medications.map((med: any) => (med.id === id ? updatedMedication : med));
+                await AsyncStorage.setItem("medications", JSON.stringify(medications));
+                console.log("Medication updated:", updatedMedication);
+
+                // Show success toast before navigating back
+                toast.show({
+                    placement: "top",
+                    duration: 3000,
+                    render: ({ id }) => {
+                        const uniqueToastId = "toast-" + id;
+                        return (
+                            <Toast
+                                action="success"
+                                variant="solid"
+                                nativeID={uniqueToastId}
+                                className="bg-lime-700 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
+                            >
+                                <Icon as={CircleCheckIcon} color="#fff" />
+                                <VStack>
+                                    <ToastTitle>Saving Successful!</ToastTitle>
+                                    <ToastDescription>Your medication has been updated.</ToastDescription>
+                                </VStack>
+                            </Toast>
+                        );
+                    },
+                });
+
+                router.back(); // Navigate back after saving
             }
+        } catch (error) {
+            console.error("Error updating medication:", error);
+            // Show error toast if saving fails
+            toast.show({
+                placement: "top",
+                duration: 3000,
+                render: ({ id }) => {
+                    const uniqueToastId = "toast-" + id;
+                    return (
+                        <Toast
+                            action="error"
+                            variant="outline"
+                            nativeID={uniqueToastId}
+                            className="bg-red-400 items-center p-4 gap-6 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
+                        >
+                            <Icon as={ShieldAlertIcon} />
+                            <VStack>
+                                <ToastTitle>Error Saving!</ToastTitle>
+                                <ToastDescription>There was an error updating your medication.</ToastDescription>
+                            </VStack>
+                        </Toast>
+                    );
+                },
+            });
         }
     }
 
@@ -293,7 +370,7 @@ export default function EditMedication() {
             ref={scrollViewRef}
             onContentSizeChange={(contentWidth, contentHeight) => {
                 if (isInitialRender.current) {
-                    isInitialRender.current = false; // skip scrolling on initial render
+                    isInitialRender.current = false;
                 } else {
                     scrollViewRef.current?.scrollTo({ y: contentHeight, animated: true });
                 }
@@ -315,11 +392,7 @@ export default function EditMedication() {
                             isRequired={true}
                             style={errors.medicationName ? { borderColor: "red", borderWidth: 1 } : {}}
                         >
-                            <InputField
-                                placeholder={"e.g. Elvanse"}
-                                value={medicationName}
-                                onChangeText={setMedicationName}
-                            />
+                            <InputField placeholder={"e.g. Elvanse"} value={medicationName} onChangeText={setMedicationName} />
                         </Input>
                     </VStack>
                     <VStack>
@@ -327,11 +400,7 @@ export default function EditMedication() {
                             Dosage
                         </Text>
                         <Input size={"xl"}>
-                            <InputField
-                                placeholder={"e.g. 50mg"}
-                                value={dosage}
-                                onChangeText={setDosage}
-                            />
+                            <InputField placeholder={"e.g. 50mg"} value={dosage} onChangeText={setDosage} />
                         </Input>
                     </VStack>
                     <VStack>
@@ -339,11 +408,7 @@ export default function EditMedication() {
                             Description/ Notes
                         </Text>
                         <Textarea size={"xl"}>
-                            <TextareaInput
-                                placeholder={"Add any notes about this medication"}
-                                value={description}
-                                onChangeText={setDescription}
-                            />
+                            <TextareaInput placeholder={"Add any notes about this medication"} value={description} onChangeText={setDescription} />
                         </Textarea>
                     </VStack>
                 </Card>
@@ -360,6 +425,7 @@ export default function EditMedication() {
                         </Text>
                         <Select
                             isRequired={true}
+                            selectedValue={medicationType}
                             onValueChange={setMedicationType}
                             style={errors.medicationType ? { borderColor: "red", borderWidth: 1 } : {}}
                         >
@@ -501,6 +567,7 @@ export default function EditMedication() {
                         </Text>
                         <Select
                             isRequired={true}
+                            selectedValue={mealRelation}
                             onValueChange={setMealRelation}
                             style={errors.mealRelation ? { borderColor: "red", borderWidth: 1 } : {}}
                         >
@@ -529,6 +596,7 @@ export default function EditMedication() {
                         </Text>
                         <Select
                             isRequired={true}
+                            selectedValue={interval}
                             onValueChange={(val) => handleIntervalChange(val)}
                             style={errors.interval ? { borderColor: "red", borderWidth: 1 } : {}}
                         >
@@ -600,8 +668,8 @@ export default function EditMedication() {
                         )}
                     </VStack>
                 </Card>
-                <HStack className={"justify-center"} space={'4xl'}>
-                    <Button variant={'outline'} size={"xl"} className={"mt-5"} onPress={() => router.back()}>
+                <HStack className={"justify-center"} space={"4xl"}>
+                    <Button variant={"outline"} size={"xl"} className={"mt-5"} onPress={() => router.back()}>
                         <ButtonIcon as={ArrowLeftIcon} />
                         <ButtonText size={"xl"}>Back</ButtonText>
                     </Button>
@@ -617,7 +685,6 @@ export default function EditMedication() {
 
 const styles = StyleSheet.create({
     scrollView: {
-        marginBottom: 5,
         borderRadius: 8,
     },
 });
